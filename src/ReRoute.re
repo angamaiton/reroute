@@ -15,7 +15,7 @@ module CreateRouter = (Config: RouterConfig) => {
       initialState: () =>
         ReasonReact.Router.dangerouslyGetInitialUrl() |> Config.routeFromUrl,
       reducer: (action, _state) =>
-        switch action {
+        switch (action) {
         | ChangeRoute(route) => ReasonReact.Update(route)
         },
       subscriptions: self => [
@@ -24,20 +24,21 @@ module CreateRouter = (Config: RouterConfig) => {
             ReasonReact.Router.watchUrl(url =>
               self.send(ChangeRoute(url |> Config.routeFromUrl))
             ),
-          ReasonReact.Router.unwatchUrl
-        )
+          ReasonReact.Router.unwatchUrl,
+        ),
       ],
-      render: self => children(~currentRoute=self.state)
+      render: self => children(~currentRoute=self.state),
     };
   };
   module Link = {
     let component = ReasonReact.statelessComponent("CallstackRerouteLink");
-    let make = (~route, children) => {
+    let make = (~route, ~className=?, children) => {
       ...component,
       render: _self => {
         let href = Config.routeToUrl(route);
         <a
           href
+          ?className
           onClick=(
             event => {
               ReactEventRe.Synthetic.preventDefault(event);
@@ -46,7 +47,7 @@ module CreateRouter = (Config: RouterConfig) => {
           )>
           (ReasonReact.arrayToElement(children))
         </a>;
-      }
+      },
     };
   };
 };
